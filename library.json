@@ -1,0 +1,14 @@
+{
+    "name": "NetCrtESP",
+    "keywords": "wifi, wi-fi, AP",
+    "description": "ESP8266 and ESP32 WiFi Connection manager with with storage of settings in EEPROM",
+    "repository":
+    {
+      "type": "git",
+      "url": "https://github.com/Lightwell-bg/NetCrtESP.git"
+    },
+    "license": "MIT",
+    "frameworks": "arduino",
+    "platforms": ["espressif8266", "espressif32"],
+    "version": "1.0"
+  }
