@@ -9,25 +9,27 @@
   #include <ESP8266WiFi.h>
 #endif
 
-#define cfgStart 32 // Tell it where to store your config data in EEPROM
+#define cfgStart 0 // Tell it where to store your config data in EEPROM
 
 const char checkVer[] = "abc"; //For first init EEPROM
 
-typedef struct  {
-    char myVersion[3];
-    String nameSSID;
-    String passSSID;
-    String nameSSDP;
-    String nameAPSSID;
-    String passAPSSID;
-} storeStruct_t;
+const uint8_t lenStr = 20;
 
-typedef struct {
+typedef struct storeStruct_t {
+    char myVersion[3];
+    char nameSSID[lenStr];
+    char passSSID[lenStr];
+    char nameSSDP[lenStr];
+    char nameAPSSID[lenStr];
+    char passAPSSID[lenStr];
+};
+
+typedef struct srtctIP {
     uint8_t oct1;
     uint8_t oct2;
     uint8_t oct3;
     uint8_t oct4;
-} srtctIP;
+};
 
 class NetCrtESP {
     public:
@@ -43,8 +45,7 @@ class NetCrtESP {
         bool setConfigWIFI(const char* ssid, const char* password, const char* SSDP_Name, const char* ssidAP, const char* passwordAP);        
         srtctIP strToIPArr(const char* chIP);
     private:
-        String _apLocalIP;
-        String _ssidAP;
+        char _apLocalIP[15];
         storeStruct_t _configWIFI;
         bool _modeAP; //after connect we know AP or not
         bool _startAPMode();

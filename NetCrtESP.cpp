@@ -6,11 +6,11 @@ NetCrtESP::NetCrtESP() {
 
 bool NetCrtESP::begin(const char* ssidAP, const char* passwordAP, const char* apLocalIP) {
     for (uint8_t i=0; i<strlen(checkVer); i++) {_configWIFI.myVersion[i] = checkVer[i];}
-    _configWIFI.nameAPSSID = ssidAP;
-    _configWIFI.passAPSSID = passwordAP;
+    strncpy(_configWIFI.nameAPSSID, ssidAP, lenStr);
+    strncpy(_configWIFI.passAPSSID, passwordAP, lenStr);
+    EEPROM.begin(4095);
     _loadConfigEEPROM();
-    _apLocalIP = apLocalIP;
-    _ssidAP = ssidAP;
+    strncpy(_apLocalIP, apLocalIP, 15);
     //Serial.println(F("WiFi up AP"));
     if (_startAPMode())  {
         _modeAP = true;
@@ -26,17 +26,17 @@ bool NetCrtESP::begin(const char* ssidAP, const char* passwordAP, const char* ap
 
 bool NetCrtESP::begin(const char* ssid, const char* password, const char* SSDP_Name, const char* ssidAP, const char* passwordAP, const char* apLocalIP) {
     for (uint8_t i=0; i<3; i++) {_configWIFI.myVersion[i] = checkVer[i];}
-    _configWIFI.nameSSID = ssid;
-    _configWIFI.passSSID = password;
-    _configWIFI.nameSSDP = SSDP_Name;
-    _configWIFI.nameAPSSID = ssidAP;
-    _configWIFI.passAPSSID = passwordAP;
+    strncpy(_configWIFI.nameSSID, ssid, lenStr);
+    strncpy(_configWIFI.passSSID, password, lenStr);
+    strncpy(_configWIFI.nameSSDP, SSDP_Name, lenStr);
+    strncpy(_configWIFI.nameAPSSID, ssidAP, lenStr);
+    strncpy(_configWIFI.passAPSSID, passwordAP, lenStr);
+    EEPROM.begin(4095);
     _loadConfigEEPROM();    
-    _apLocalIP = apLocalIP;
-    _ssidAP = ssidAP;
+    strncpy(_apLocalIP, apLocalIP, 15);
     WiFi.mode(WIFI_STA); //WiFi.mode(WIFI_AP_STA);
     uint8_t tries = 10;
-    WiFi.begin(_configWIFI.nameSSID.c_str(), _configWIFI.passSSID.c_str());
+    WiFi.begin(_configWIFI.nameSSID, _configWIFI.passSSID);
     while (--tries && WiFi.status() != WL_CONNECTED)  {   
         Serial.print(F("."));
         delay(1000);
@@ -63,12 +63,12 @@ bool NetCrtESP::begin(const char* ssid, const char* password, const char* SSDP_N
 }
 
 bool NetCrtESP::_startAPMode() {
-    srtctIP myIP = strToIPArr(_apLocalIP.c_str());
+    srtctIP myIP = strToIPArr(_apLocalIP);
     IPAddress apLocalIPCl(myIP.oct1,myIP.oct2,myIP.oct3,myIP.oct4);
     WiFi.disconnect();   
-    WiFi.mode(WIFI_AP);   // Меняем режим на режим точки доступа
+    WiFi.mode(WIFI_AP);   // change mode AP
     WiFi.softAPConfig(apLocalIPCl, apLocalIPCl, IPAddress(255, 255, 255, 0));  
-    if (WiFi.softAP(_configWIFI.nameAPSSID.c_str(), _configWIFI.passAPSSID.c_str())) return true;
+    if (WiFi.softAP(_configWIFI.nameAPSSID, _configWIFI.passAPSSID)) return true;
     else {
         Serial.println(F("Can't create AP"));
         return false;
@@ -76,7 +76,7 @@ bool NetCrtESP::_startAPMode() {
 }
 
 String  NetCrtESP::getDevStatusIP() {
-    if (_modeAP) return String("WIFI_AP " + WiFi.softAPIP().toString() + " AP name " + _ssidAP);
+    if (_modeAP) return String("WIFI_AP " + WiFi.softAPIP().toString() + " AP name " + _configWIFI.nameAPSSID);
     else return String("WIFI_STA " + WiFi.localIP().toString());
 }
 
@@ -111,26 +111,24 @@ String NetCrtESP::getPassAPSSID() {
 }
 
 bool NetCrtESP::setConfigWIFI(const char* ssid, const char* password, const char* SSDP_Name, const char* ssidAP, const char* passwordAP) {
-    storeStruct_t newConfWIFI;
-    for (uint8_t i=0; i<3; i++) {newConfWIFI.myVersion[i] = checkVer[i];}
-    _configWIFI.nameSSID = ssid;
-    _configWIFI.passSSID = password;
-    _configWIFI.nameSSDP = SSDP_Name;
-    _configWIFI.nameAPSSID = ssidAP;
-    _configWIFI.passAPSSID = passwordAP;
-    if(_saveConfigEEPROM(_configWIFI)) return true; else return false;       
+    for (uint8_t i=0; i<3; i++) {_configWIFI.myVersion[i] = checkVer[i];}
+    strncpy(_configWIFI.nameSSID, ssid, lenStr);
+    strncpy(_configWIFI.passSSID, password, lenStr);
+    strncpy(_configWIFI.nameSSDP, SSDP_Name, lenStr);
+    strncpy(_configWIFI.nameAPSSID, ssidAP, lenStr);
+    strncpy(_configWIFI.passAPSSID, passwordAP, lenStr);
+    if(_saveConfigEEPROM(_configWIFI)) {Serial.println("OOKK"); return true;} else {Serial.println("NOOOOKK"); return false;} //**********      
 }
 
 bool NetCrtESP::_saveConfigEEPROM(storeStruct_t _conf) {   // Save configuration from RAM into EEPROM
-    EEPROM.begin(4095);
     EEPROM.put(cfgStart, _conf);
     //delay(200);
     if (EEPROM.commit()) {                      // Only needed for ESP8266 to get data written
-        EEPROM.end();                           // Free RAM copy of structure
+        //EEPROM.end();                           // Free RAM copy of structure
         return true; 
     }
     else {
-        EEPROM.end();                           // Free RAM copy of structure
+        //EEPROM.end();                           // Free RAM copy of structure
         return false;         
     }                         
                         
@@ -141,19 +139,19 @@ void NetCrtESP::_loadConfigEEPROM() {  // Loads configuration from EEPROM into R
     storeStruct_t load;
     EEPROM.begin(4095);
     EEPROM.get(cfgStart, load);
-    EEPROM.end();
+    //EEPROM.end();
     // Check if it is your real struct
     if (load.myVersion[0] != checkVer[0] ||
         load.myVersion[1] != checkVer[1] ||
         load.myVersion[2] != checkVer[2]) {
-        _saveConfigEEPROM(_configWIFI);
-        return;
-    }
+            _saveConfigEEPROM(_configWIFI);
+            return;
+        }
     _configWIFI = load;
-    /*Serial.print("_configWIFI.myVersion ");Serial.println(_configWIFI.myVersion);
+    Serial.print("_configWIFI.myVersion ");Serial.println(_configWIFI.myVersion);
     Serial.print("_configWIFI.nameSSID ");Serial.println(_configWIFI.nameSSID);
     Serial.print("_configWIFI.passSSID ");Serial.println(_configWIFI.passSSID);
     Serial.print("_configWIFI.nameSSDP ");Serial.println(_configWIFI.nameSSDP);
     Serial.print("_configWIFI.nameAPSSID ");Serial.println(_configWIFI.nameAPSSID);
-    Serial.print("_configWIFI.passAPSSID ");Serial.println(_configWIFI.passAPSSID);*/
+    Serial.print("_configWIFI.passAPSSID ");Serial.println(_configWIFI.passAPSSID);
 }
