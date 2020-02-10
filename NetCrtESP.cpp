@@ -148,10 +148,10 @@ void NetCrtESP::_loadConfigEEPROM() {  // Loads configuration from EEPROM into R
             return;
         }
     _configWIFI = load;
-    /*Serial.print("_configWIFI.myVersion ");Serial.println(_configWIFI.myVersion);
+    Serial.print("_configWIFI.myVersion ");Serial.println(_configWIFI.myVersion);
     Serial.print("_configWIFI.nameSSID ");Serial.println(_configWIFI.nameSSID);
     Serial.print("_configWIFI.passSSID ");Serial.println(_configWIFI.passSSID);
     Serial.print("_configWIFI.nameSSDP ");Serial.println(_configWIFI.nameSSDP);
     Serial.print("_configWIFI.nameAPSSID ");Serial.println(_configWIFI.nameAPSSID);
-    Serial.print("_configWIFI.passAPSSID ");Serial.println(_configWIFI.passAPSSID);*/
+    Serial.print("_configWIFI.passAPSSID ");Serial.println(_configWIFI.passAPSSID);
 }

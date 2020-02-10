@@ -11,7 +11,7 @@
 
 #define cfgStart 0 // Tell it where to store your config data in EEPROM
 
-const char checkVer[] = "abc"; //For first init EEPROM
+const char checkVer[] = "abv"; //For first init EEPROM
 
 const uint8_t lenStr = 20;
 
