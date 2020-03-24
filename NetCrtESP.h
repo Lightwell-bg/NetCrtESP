@@ -36,6 +36,7 @@ class NetCrtESP {
         NetCrtESP(); 
         bool begin(const char* ssidAP, const char* passwordAP, const char* apLocalIP = "192.168.4.1");
         bool begin(const char* ssid, const char* password, const char* SSDP_Name, const char* ssidAP, const char* passwordAP, const char* apLocalIP = "192.168.4.1");
+        bool reconectWIFI();
         String getDevStatusIP();
         String getNameSSID();
         String getPassSSID();

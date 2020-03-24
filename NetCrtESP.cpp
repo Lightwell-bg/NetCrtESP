@@ -75,8 +75,21 @@ bool NetCrtESP::_startAPMode() {
     }
 }
 
+bool NetCrtESP::reconectWIFI() {
+    if (!_modeAP && (WiFi.status() != WL_CONNECTED)) {
+        WiFi.mode(WIFI_STA); //WiFi.mode(WIFI_AP_STA);
+        uint8_t tries = 10;
+        WiFi.begin(_configWIFI.nameSSID, _configWIFI.passSSID);
+        while (--tries && WiFi.status() != WL_CONNECTED)  {   
+            Serial.print(F("."));
+            delay(1000);
+        }
+    }
+    if (WiFi.status() != WL_CONNECTED) return false; else return true;
+}
+
 String  NetCrtESP::getDevStatusIP() {
-    if (_modeAP) return String("WIFI_AP " + WiFi.softAPIP().toString() + " AP name " + _configWIFI.nameAPSSID);
+    if (_modeAP) return String("WIFI_AP " + WiFi.softAPIP().toString() + " AP " + _configWIFI.nameAPSSID);
     else return String("WIFI_STA " + WiFi.localIP().toString());
 }
 

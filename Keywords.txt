@@ -2,6 +2,7 @@ NetCrtESP   KEYWORD1
 storeStruct_t   KEYWORD1
 srtctIP KEYWORD1
 begin   KEYWORD2
+reconectWIFI	KEYWORD2
 getDevStatusIP  KEYWORD2
 getNameSSID KEYWORD2
 getPassSSID KEYWORD2
