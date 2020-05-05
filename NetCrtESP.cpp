@@ -77,6 +77,7 @@ bool NetCrtESP::_startAPMode() {
 
 bool NetCrtESP::reconectWIFI() {
     if (!_modeAP && (WiFi.status() != WL_CONNECTED)) {
+        WiFi.disconnect();
         WiFi.mode(WIFI_STA); //WiFi.mode(WIFI_AP_STA);
         uint8_t tries = 10;
         WiFi.begin(_configWIFI.nameSSID, _configWIFI.passSSID);
