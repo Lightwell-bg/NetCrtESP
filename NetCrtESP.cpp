@@ -67,7 +67,10 @@ bool NetCrtESP::_startAPMode() {
     IPAddress apLocalIPCl(myIP.oct1,myIP.oct2,myIP.oct3,myIP.oct4);
     WiFi.disconnect();   
     WiFi.mode(WIFI_AP);   // change mode AP
-    WiFi.softAPConfig(apLocalIPCl, apLocalIPCl, IPAddress(255, 255, 255, 0));  
+    //WiFi.softAPConfig(apLocalIPCl, apLocalIPCl, IPAddress(255, 255, 255, 0)); 
+    WiFi.softAPConfig(apLocalIPCl, IPAddress(192, 168, 4, 100), IPAddress(255, 255, 255, 0));
+    const char emptyPass[] = "";
+    if (strlen(_configWIFI.passAPSSID) < 8 || strlen(_configWIFI.passAPSSID) > 63)  strncpy(_configWIFI.passAPSSID, emptyPass, lenStr);
     if (WiFi.softAP(_configWIFI.nameAPSSID, _configWIFI.passAPSSID)) return true;
     else {
         Serial.println(F("Can't create AP"));
