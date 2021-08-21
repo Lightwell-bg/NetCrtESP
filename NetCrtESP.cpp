@@ -137,6 +137,37 @@ bool NetCrtESP::setConfigWIFI(const char* ssid, const char* password, const char
     if(_saveConfigEEPROM(_configWIFI)) {Serial.println("OOKK"); return true;} else {Serial.println("NOOOOKK"); return false;} //**********      
 }
 
+//UDP
+void NetCrtESP::beginUDP(uint16_t localUdpPort) {
+    _Udp.begin(localUdpPort);
+    Serial.printf("Now listening at IP %s, UDP port %d\n", getDevStatusIP().c_str(), localUdpPort);
+    //return true;
+}
+
+void NetCrtESP::returnIPtoUDP(uint16_t localUdpPort) {
+    String _SSDP_Name;
+    uint8_t _packetSize = _Udp.parsePacket();
+    char host[16];
+    if (_packetSize != 0) {// получаем входящие UDP-пакеты:
+        Serial.printf("Received %d bytes from %s, port %d\n", _packetSize, _Udp.remoteIP().toString().c_str(), _Udp.remotePort());
+        uint8_t len = _Udp.read(_incomingPacket, 255);
+        if (len > 0) {
+            _incomingPacket[len] = '\0';
+        }
+        Serial.printf("UDP packet contents: %s\n", _incomingPacket);
+        // отправляем ответ на IP-адрес и порт, с которых пришел пакет: 
+        _SSDP_Name = getNameSSDP();
+        _SSDP_Name.toCharArray(host, _SSDP_Name.length()+1);
+        _Udp.beginPacket(_Udp.remoteIP(), _Udp.remotePort());
+//#if defined(ESP32)
+        _Udp.write((uint8_t*)host, strlen(host));
+//#elif defined(ESP8266)
+        //_Udp.write(host);
+//#endif
+        _Udp.endPacket();
+    }
+}
+
 bool NetCrtESP::_saveConfigEEPROM(storeStruct_t _conf) {   // Save configuration from RAM into EEPROM
     EEPROM.put(cfgStart, _conf);
     //delay(200);

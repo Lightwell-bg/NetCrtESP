@@ -3,11 +3,12 @@
 
 #include <Arduino.h>
 #include <EEPROM.h>
-#ifdef ESP32
+#if defined(ESP32)
   #include <WiFi.h>
-#else
+#elif defined(ESP8266)
   #include <ESP8266WiFi.h>
 #endif
+#include <WiFiUdp.h>
 
 #define cfgStart 0 // Tell it where to store your config data in EEPROM
 
@@ -45,6 +46,8 @@ class NetCrtESP {
         String getPassAPSSID();
         bool setConfigWIFI(const char* ssid, const char* password, const char* SSDP_Name, const char* ssidAP, const char* passwordAP);        
         srtctIP strToIPArr(const char* chIP);
+        void beginUDP(uint16_t localUdpPort);
+        void returnIPtoUDP(uint16_t localUdpPort = 4210);
     private:
         char _apLocalIP[15];
         storeStruct_t _configWIFI;
@@ -52,6 +55,8 @@ class NetCrtESP {
         bool _startAPMode();
         bool _saveConfigEEPROM(storeStruct_t _conf);
         void _loadConfigEEPROM();
+        WiFiUDP _Udp;
+        char _incomingPacket[255];
 };
 
 #endif
